@@ -1,2 +1,8 @@
 Django
 django-environ
+djangorestframework
+djangorestframework-simplejwt
+dj-rest-auth 
+django-allauth 
+djangorestframework-simplejwt
+requests
