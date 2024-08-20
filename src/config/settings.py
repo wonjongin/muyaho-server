@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'user',
     'notice',
-    'notification',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'dj_rest_auth',
@@ -82,7 +81,7 @@ ACCOUNT_EMAIL_REQUIRED = True             # email 필드 사용 o
 ACCOUNT_USERNAME_REQUIRED = False         # username 필드 사용 x
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
-
+REST_SESSION_LOGIN = False
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 # APPEND_SLASH=False
 

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin, BaseUserManager, AbstractBaseUser
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from notice.models import Notice
 from django.contrib.auth.hashers import make_password, is_password_usable
 # from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 
@@ -48,3 +49,23 @@ class User(AbstractBaseUser, PermissionsMixin):
 def password_hashing(instance, **kwargs):
     if not is_password_usable(instance.password):
         instance.password = make_password(instance.password)
+
+
+
+class Keyword(models.Model):
+    title = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Notification(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    remind_date = models.DateTimeField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Scrap(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
+
+class Search(models.Model):
+    query = models.CharField(max_length=50)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
