@@ -8,5 +8,6 @@ class Notice(models.Model):
     description = models.TextField()
     notice_id = models.IntegerField()
     date = models.DateField()
+    tdindex = models.TextField()
 
 

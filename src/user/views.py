@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
-from user.models import Keyword, Search, Scrap, Notification
+from user.models import Keyword, Scrap, Notification, AlarmSettings
 from notice.models import Notice
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -32,7 +32,6 @@ def my_keywords(request):
         keyword = Keyword(title= data['title'], user= thisuser)
         keyword.save()
         return JsonResponse({'title': keyword.title, 'user_id': keyword.user.id})
-<<<<<<< HEAD
 
 @csrf_exempt
 def edit_keywords(request,num):
@@ -59,11 +58,20 @@ def delete_keywords(request, num):
             return JsonResponse({"message": "Fail..."}, status=401)
 
 @csrf_exempt
-def my_notifications(request):
+def setting_notifications(request): #설정한 알림의 목록
+    if request.method == "GET":
+        thisuser = request.user
+        notifications = AlarmSettings.objects.filter(user=thisuser).values()
+        return JsonResponse(list(notifications), safe=False)
+    
+@csrf_exempt
+def my_notifications(request): #알림설정한 걸 통해서 온 알림의 목롬
     if request.method == "GET":
         thisuser = request.user
         notifications = Notification.objects.filter(user=thisuser).values()
         return JsonResponse(list(notifications), safe=False)
+        #notice랑 연결
+        
 
 @csrf_exempt
 def my_notification(request, num):
@@ -75,7 +83,9 @@ def my_notification(request, num):
             'description': notification.description,
             'remind_date': notification.remind_date.isoformat()
         })
-    elif request.method == "POST":
+@csrf_exempt
+def create_notification(request):
+    if request.method == "POST":
         thisuser = request.user
         data = json.loads(request.body)
         notification = Notification(
@@ -88,7 +98,7 @@ def my_notification(request, num):
         return JsonResponse({
             'title': notification.title,
             'description': notification.description,
-            'remind_date': notification.remind_date.isoformat()
+            'remind_date': notification.remind_date
         })
 
 @csrf_exempt
@@ -105,7 +115,7 @@ def edit_notification(request, num):
             return JsonResponse({
                 'title': notification.title,
                 'description': notification.description,
-                'remind_date': notification.remind_date.isoformat()
+                'remind_date': notification.remind_date
             })
         else:
             return JsonResponse({"message": "Unauthorized"}, status=401)
@@ -121,16 +131,23 @@ def delete_notification(request, num):
         else:
             return JsonResponse({"message": "Fail..."}, status=401)
 
-=======
-    
->>>>>>> dev_k
-
 @csrf_exempt
 def my_scraps(request):
     if request.method == "GET":
         thisuser = request.user
-        scrap = Scrap.object.filter(user=thisuser).values()
-        return JsonResponse(list(scrap), safe=False)
+        scraps = Scrap.objects.filter(user=thisuser)
+        # return JsonResponse(list(scrap), safe=False)
+        res = []
+        for scrap in scraps:
+            res.append({
+                'id': scrap.notice.id,
+                'title':scrap.notice.title,
+                'description': scrap.notice.description,
+                'notitype': str(scrap.notice.notitype) ,
+                'url': scrap.notice.url,
+                'date': scrap.notice.date
+                })
+        return JsonResponse(res, safe=False)
 
 @csrf_exempt
 def add_scrap(request):

@@ -11,6 +11,7 @@ urlpatterns = [
     path('deleteKeywords/<int:num>', views.delete_keywords),
     path('myNotifications/', views.my_notifications),
     path('myNotification/<int:num>', views.my_notification),
+    path('createNotification/', views.create_notification),
     path('editNotifications/<int:num>', views.edit_notification),
     path('deleteNotification/<int:num>', views.delete_notification),
     path('myScraps/', views.my_scraps),
