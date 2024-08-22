@@ -18,7 +18,7 @@ def myinfo(request):
 
     elif request.method == "PATCH":
         return HttpResponse("Hello")
-    
+
 @csrf_exempt
 def my_keywords(request):
     if request.method == "GET":
@@ -32,6 +32,7 @@ def my_keywords(request):
         keyword = Keyword(title= data['title'], user= thisuser)
         keyword.save()
         return JsonResponse({'title': keyword.title, 'user_id': keyword.user.id})
+<<<<<<< HEAD
 
 @csrf_exempt
 def edit_keywords(request,num):
@@ -120,6 +121,9 @@ def delete_notification(request, num):
         else:
             return JsonResponse({"message": "Fail..."}, status=401)
 
+=======
+    
+>>>>>>> dev_k
 
 @csrf_exempt
 def my_scraps(request):
@@ -148,4 +152,3 @@ def delete_scrap(request, num):
             return JsonResponse({"message": "Success!"})
         else:
             return JsonResponse({"message": "Fail..."}, status=401) 
-        
