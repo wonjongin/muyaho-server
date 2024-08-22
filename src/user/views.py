@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
-from user.models import Keyword, Search, Scrap
+from user.models import Keyword, Search, Scrap, Notification
 from notice.models import Notice
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -32,12 +32,100 @@ def my_keywords(request):
         keyword = Keyword(title= data['title'], user= thisuser)
         keyword.save()
         return JsonResponse({'title': keyword.title, 'user_id': keyword.user.id})
-    
+
+@csrf_exempt
+def edit_keywords(request,num):
+    if request.method == "PATCH":
+        thisuser = request.user
+        data = json.loads(request.body)
+        keyword = Keyword.objects.get(id = num)
+        if keyword.user == thisuser:
+            keyword.title = data.get('title', keyword.title)
+            keyword.save()
+            return JsonResponse({'mykeywords': keyword.title})
+        else:
+            return JsonResponse({"message": "Unauthorized"}, status=401)
+
+@csrf_exempt
+def delete_keywords(request, num):
+    if request.method == "DELETE":
+        thisuser = request.user
+        keyword = Keyword.objects.get(id = num)
+        if keyword.user == thisuser:
+            keyword.delete()
+            return JsonResponse({"message": "Success!"})
+        else:
+            return JsonResponse({"message": "Fail..."}, status=401)
+
+@csrf_exempt
+def my_notifications(request):
+    if request.method == "GET":
+        thisuser = request.user
+        notifications = Notification.objects.filter(user=thisuser).values()
+        return JsonResponse(list(notifications), safe=False)
+
+@csrf_exempt
+def my_notification(request, num):
+    if request.method == "GET":
+        thisuser = request.user
+        notification = Notification.objects.get(id=num, user=thisuser)
+        return JsonResponse({
+            'title': notification.title,
+            'description': notification.description,
+            'remind_date': notification.remind_date.isoformat()
+        })
+    elif request.method == "POST":
+        thisuser = request.user
+        data = json.loads(request.body)
+        notification = Notification(
+            title = data['title'],
+            description = data['description'],
+            remind_date = data['remind_date'],
+            user = thisuser
+        )
+        notification.save()
+        return JsonResponse({
+            'title': notification.title,
+            'description': notification.description,
+            'remind_date': notification.remind_date.isoformat()
+        })
+
+@csrf_exempt
+def edit_notification(request, num):
+    if request.method == "PATCH":
+        thisuser = request.user
+        data = json.loads(request.body)
+        notification = Notification.objects.get(id=num)
+        if notification.user == thisuser:
+            notification.title = data.get('title', notification.title)
+            notification.description = data.get('description', notification.description)
+            notification.remind_date = data.get('remind_date', notification.remind_date)
+            notification.save()
+            return JsonResponse({
+                'title': notification.title,
+                'description': notification.description,
+                'remind_date': notification.remind_date.isoformat()
+            })
+        else:
+            return JsonResponse({"message": "Unauthorized"}, status=401)
+
+@csrf_exempt
+def delete_notification(request, num):
+    if request.method == "DELETE":
+        thisuser = request.user
+        notification = Notification.objects.get(id=num)
+        if notification.user == thisuser:
+            notification.delete()
+            return JsonResponse({"message": "Success!"})
+        else:
+            return JsonResponse({"message": "Fail..."}, status=401)
+
+
 @csrf_exempt
 def my_scraps(request):
     if request.method == "GET":
         thisuser = request.user
-        scrap = scrap.object.filter(user=thisuser).values()
+        scrap = Scrap.object.filter(user=thisuser).values()
         return JsonResponse(list(scrap), safe=False)
 
 @csrf_exempt
