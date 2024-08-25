@@ -2,9 +2,10 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('test/', views.test),
-    path('myInfo/', views.myinfo),
-    path('myKeywords/', views.my_keywords),
-    path('editKeywords/<int:num>', views.edit_keywords),
-    path('deleteKeywords/<int:num>', views.delete_keywords)
+    path('notices/', views.notices),
+    path('notice/<int:num>', views.notice),
+    path('notices/notitype/<type>', views.notitypes),
+    path('notices/search/<query>', views.searches),
+    path('notices/<query>/<type>', views.s_type),
+    path('notices/date/<query>/<int:fromdate>', views.dates),
 ]

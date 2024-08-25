@@ -6,6 +6,7 @@ from notice.models import Notice
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+#notification이랑 notice relation하기
 
 def test(request):
     return HttpResponse("Hello")
@@ -131,10 +132,19 @@ def delete_alarmsettings(request, num):
 def my_notifications(request): #알림설정한 걸 통해서 온 알림의 목록
     if request.method == "GET":
         thisuser = request.user
-        notifications = Notification.objects.filter(user=thisuser).values()
-        notice = Notice.objects.filter(notice_id=notifications)
-        return JsonResponse(list(notice), safe=False)
-        #notice랑 연결
+        notifications = Notification.objects.filter(user=thisuser).values('id', 'keyword', 'title', 'description', 'remind_date')
+        res = []
+        for r in notifications:
+            res.append({
+                'title': r.title,
+                'id': r.id,
+                'keyword': r.keyword,
+                'description': r.description,
+                'remind_date': r.remind.date,
+                'notice_id': r.notice.id
+            })
+        # notice = Notice.objects.filter(id=notifications.notice.id)
+        return JsonResponse(res, safe=False)
 
 @csrf_exempt
 def my_notification(request):

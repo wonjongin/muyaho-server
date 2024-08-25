@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'dj_rest_auth.registration',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -175,3 +176,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+CRONJOBS = [
+    ('*/1 * * * *', 'core.cron.delete_sessions'),
+]
