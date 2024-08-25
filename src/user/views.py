@@ -1,24 +1,27 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
-from user.models import Keyword, Search, Scrap, Notification
+from user.models import Keyword, Scrap, Notification, AlarmSettings
 from notice.models import Notice
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+#notification이랑 notice relation하기
 
 def test(request):
     return HttpResponse("Hello")
 
+#info
 @csrf_exempt
 def myinfo(request):
-    if request.method == "GET":
+    if request.method == "GET": 
         user = request.user
         return JsonResponse({'email': user.email, 'password': user.password})
 
     elif request.method == "PATCH":
         return HttpResponse("Hello")
-    
+
+#keyword
 @csrf_exempt
 def my_keywords(request):
     if request.method == "GET":
@@ -57,76 +60,122 @@ def delete_keywords(request, num):
         else:
             return JsonResponse({"message": "Fail..."}, status=401)
 
+#setting
 @csrf_exempt
-def my_notifications(request):
+def my_alarmsettings(request): #설정한 알림의 목록
     if request.method == "GET":
         thisuser = request.user
-        notifications = Notification.objects.filter(user=thisuser).values()
-        return JsonResponse(list(notifications), safe=False)
+        alarms = AlarmSettings.objects.filter(user=thisuser).values()
+        return JsonResponse(list(alarms), safe=False)
+        
+@csrf_exempt
+def my_alarmsetting(request, num):
+    if request.method == "GET":
+        thisuser = request.user
+        alarms = AlarmSettings.objects.get(id=num, user=thisuser)
+        return JsonResponse({
+            'keyword': alarms.keyword,
+            'alarm_date': alarms.alram_date.isoformat(),
+            'alarm_days': alarms.alarm_days
+        })
 
 @csrf_exempt
-def my_notification(request, num):
-    if request.method == "GET":
-        thisuser = request.user
-        notification = Notification.objects.get(id=num, user=thisuser)
-        return JsonResponse({
-            'title': notification.title,
-            'description': notification.description,
-            'remind_date': notification.remind_date.isoformat()
-        })
-    elif request.method == "POST":
+def create_alarmsettings(request):
+    if request.method == "POST":
         thisuser = request.user
         data = json.loads(request.body)
-        notification = Notification(
-            title = data['title'],
-            description = data['description'],
-            remind_date = data['remind_date'],
+        alarms = AlarmSettings(
+            keyword = data['keyword'],
+            alarm_date = data['alarm_date'],
+            alarm_days = data['alarm_days'],
             user = thisuser
         )
-        notification.save()
+        alarms.save()
         return JsonResponse({
-            'title': notification.title,
-            'description': notification.description,
-            'remind_date': notification.remind_date.isoformat()
+            'keyword': alarms.keyword,
+            'alarm_date': alarms.alarm_date,
+            'alarm_days': alarms.alarm_days
         })
 
 @csrf_exempt
-def edit_notification(request, num):
+def edit_alarmsettings(request, num):
     if request.method == "PATCH":
         thisuser = request.user
         data = json.loads(request.body)
-        notification = Notification.objects.get(id=num)
-        if notification.user == thisuser:
-            notification.title = data.get('title', notification.title)
-            notification.description = data.get('description', notification.description)
-            notification.remind_date = data.get('remind_date', notification.remind_date)
-            notification.save()
+        alarms = AlarmSettings.objects.get(id=num)
+        if  alarms.user == thisuser:
+            alarms.keyword = data.get('keyword', alarms.keyword)
+            alarms.alarm_date = data.get('alarm_date', alarms.alarm_date)
+            alarms.alarm_days = data.get('remind_date', alarms.alarm_days)
+            alarms.save()
             return JsonResponse({
-                'title': notification.title,
-                'description': notification.description,
-                'remind_date': notification.remind_date.isoformat()
+                'keyword': alarms.keyword,
+                'alarm_date': alarms.alarm_date,
+                'alarm_days': alarms.alarm_days
             })
         else:
             return JsonResponse({"message": "Unauthorized"}, status=401)
 
 @csrf_exempt
-def delete_notification(request, num):
+def delete_alarmsettings(request, num):
     if request.method == "DELETE":
         thisuser = request.user
-        notification = Notification.objects.get(id=num)
-        if notification.user == thisuser:
-            notification.delete()
+        alarms = AlarmSettings.objects.get(id=num)
+        if  alarms.user == thisuser:
+            alarms.delete()
             return JsonResponse({"message": "Success!"})
         else:
             return JsonResponse({"message": "Fail..."}, status=401)
 
+#notification  
+@csrf_exempt
+def my_notifications(request): #알림설정한 걸 통해서 온 알림의 목록
+    if request.method == "GET":
+        thisuser = request.user
+        notifications = Notification.objects.filter(user=thisuser).values('id', 'keyword', 'title', 'description', 'remind_date')
+        res = []
+        for r in notifications:
+            res.append({
+                'title': r.title,
+                'id': r.id,
+                'keyword': r.keyword,
+                'description': r.description,
+                'remind_date': r.remind.date,
+                'notice_id': r.notice.id
+            })
+        # notice = Notice.objects.filter(id=notifications.notice.id)
+        return JsonResponse(res, safe=False)
 
+@csrf_exempt
+def my_notification(request):
+    if request.method == "GET":
+        thisuser = request.user
+        alarms = Notification.objects.filter(user=thisuser).values()
+        return JsonResponse(list(alarms), safe=False)
+
+@csrf_exempt
+def delete_notifications(request, num):
+    if request.method == "DELETE":
+        thisuser = request.user
+        
+#scrap
 @csrf_exempt
 def my_scraps(request):
     if request.method == "GET":
         thisuser = request.user
-        scrap = Scrap.object.filter(user=thisuser).values()
-        return JsonResponse(list(scrap), safe=False)
+        scraps = Scrap.objects.filter(user=thisuser)
+        # return JsonResponse(list(scrap), safe=False)
+        res = []
+        for scrap in scraps:
+            res.append({
+                'id': scrap.notice.id,
+                'title':scrap.notice.title,
+                'description': scrap.notice.description,
+                'notitype': str(scrap.notice.notitype) ,
+                'url': scrap.notice.url,
+                'date': scrap.notice.date
+                })
+        return JsonResponse(res, safe=False)
 
 @csrf_exempt
 def add_scrap(request):
@@ -148,4 +197,3 @@ def delete_scrap(request, num):
             return JsonResponse({"message": "Success!"})
         else:
             return JsonResponse({"message": "Fail..."}, status=401) 
-        

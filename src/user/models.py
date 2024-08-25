@@ -56,16 +56,29 @@ class Keyword(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-class Notification(models.Model):
+class AlarmSettings(models.Model): #알람
+    keyword = models.CharField(max_length=100)
+    alarm_date = models.DateTimeField()
+    alarm_days = models.IntegerField()
+    # 월 수 금: 2+8+32 = 42
+    # 알람 없을 때: 0 
+    # 일: 1
+    # 월: 2
+    # 화: 4
+    # 수: 8
+    # 목: 16
+    # 금: 32
+    # 토: 64
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Notification(models.Model): #알림
+    keyword = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
     description = models.TextField()
     remind_date = models.DateTimeField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
 
 class Scrap(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
-
-class Search(models.Model):
-    query = models.CharField(max_length=50)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
