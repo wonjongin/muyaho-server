@@ -37,7 +37,6 @@ def crawl_notices():
                 date = soup_detail.select_one('#content_focus > div > div.board_view > div.tit > div > span:nth-child(1)').get_text()
                 # author =   작성자 #content_focus > div > div.board_view > div.tit > div > span:nth-child(2)
                 # views =    조회수 #content_focus > div > div.board_view > div.tit > div > span:nth-child(3)
-                # to. 서연 위에 주석 두 줄 신경쓰지 마세욥~
 
                 ps = soup_detail.select('#content_focus > div > div.board_view > div.view_cont > p')
                 imgs = []
