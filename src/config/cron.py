@@ -2,6 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import json
 
+def hello_world():
+    print("Hello world!")
+
 
 def crawl_notices () :
     notitypes = "JANGHAKNOTICE GENERALNOTICE HAKSANOTICE IPSINOTICE GLOBALNOTICE HAKSULNOTICE SAFENOTICE BUDDHISTEVENT".split(" ")

@@ -4,6 +4,9 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from notice.models import Notice
 from django.contrib.auth.hashers import make_password, is_password_usable
+import environ
+import os
+from django.conf import settings
 # from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 
 
@@ -48,7 +51,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 @receiver(pre_save, sender=User)
 def password_hashing(instance, **kwargs):
     if not is_password_usable(instance.password):
-        instance.password = make_password(instance.password)
+        env = environ.Env()
+
+        environ.Env.read_env(
+	        env_file = os.path.join(settings.BASE_DIR.parent, '.env')
+        )
+
+        instance.password = make_password(instance.password, env('SALT'))
 
 
 
