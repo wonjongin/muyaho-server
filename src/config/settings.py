@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import environ
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -178,5 +178,8 @@ SIMPLE_JWT = {
 }
 
 CRONJOBS = [
-    ('*/1 * * * *', 'core.cron.delete_sessions'),
+    # ('*/1 * * * *', 'config.cron.crawl_notices'),
+    ('*/1 * * * *', 'config.cron.hello_world', '>> '+ os.path.join(BASE_DIR, f"config/log/cron_{datetime.now().strftime('%Y-%m-%d')}.log"))
+    # ('*/5 * * * *', 'config.cron.crawl_notices'),
+    # ('*/1 * * * *', 'config.cron.crawl_notices'),
 ]
