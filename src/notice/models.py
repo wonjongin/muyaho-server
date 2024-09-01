@@ -11,5 +11,8 @@ class Notice(models.Model):
     notice_id = models.IntegerField()
     date = models.DateField()
     tdindex = models.TextField() #타이틀+내용 같이있는 텍스트
+    imgs = models.JSONField()
+    links = models.JSONField()
+    attachments = models.JSONField()
 
 
