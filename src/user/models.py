@@ -1,5 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, PermissionsMixin, BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import (
+    AbstractUser,
+    PermissionsMixin,
+    BaseUserManager,
+    AbstractBaseUser,
+)
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from notice.models import Notice
@@ -13,7 +18,7 @@ from django.conf import settings
 class UserManager(BaseUserManager):
     def create_user(self, email, password, **kwargs):
         if not email:
-            raise ValueError('Users must have an email address')
+            raise ValueError("Users must have an email address")
 
         user = self.model(
             email=email,
@@ -45,7 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
 
 
 @receiver(pre_save, sender=User)
@@ -53,24 +58,22 @@ def password_hashing(instance, **kwargs):
     if not is_password_usable(instance.password):
         env = environ.Env()
 
-        environ.Env.read_env(
-	        env_file = os.path.join(settings.BASE_DIR.parent, '.env')
-        )
+        environ.Env.read_env(env_file=os.path.join(settings.BASE_DIR.parent, ".env"))
 
-        instance.password = make_password(instance.password, env('SALT'))
-
+        instance.password = make_password(instance.password, env("SALT"))
 
 
 class Keyword(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-class AlarmSettings(models.Model): #알람
+
+class AlarmSettings(models.Model):  # 알람
     keyword = models.CharField(max_length=100)
     alarm_date = models.DateTimeField()
     alarm_days = models.IntegerField()
     # 월 수 금: 2+8+32 = 42
-    # 알람 없을 때: 0 
+    # 알람 없을 때: 0
     # 일: 1
     # 월: 2
     # 화: 4
@@ -80,7 +83,8 @@ class AlarmSettings(models.Model): #알람
     # 토: 64
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-class Notification(models.Model): #알림
+
+class Notification(models.Model):  # 알림
     keyword = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -88,6 +92,13 @@ class Notification(models.Model): #알림
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
 
+
 class Scrap(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
+
+
+class Device(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    fcmToken = models.CharField("FCM Token", blank=True, max_length=500, null=True)
+    

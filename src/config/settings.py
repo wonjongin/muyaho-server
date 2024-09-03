@@ -14,6 +14,8 @@ from pathlib import Path
 import environ
 import os
 from datetime import timedelta, datetime
+import firebase_admin
+from firebase_admin import credentials
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +28,12 @@ env = environ.Env(
 environ.Env.read_env(
 	env_file = os.path.join(BASE_DIR.parent, '.env')
 )
+
+
+
+cred_path = os.path.join(BASE_DIR, "serviceAccountKey.json")
+cred = credentials.Certificate(cred_path)
+firebase_admin.initialize_app(cred)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/

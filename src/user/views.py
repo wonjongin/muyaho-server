@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
-from user.models import Keyword, Scrap, Notification, AlarmSettings
+from user.models import Keyword, Scrap, Notification, AlarmSettings, Device
 from notice.models import Notice
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -197,3 +197,13 @@ def delete_scrap(request, num):
             return JsonResponse({"message": "Success!"})
         else:
             return JsonResponse({"message": "Fail..."}, status=401) 
+
+
+@csrf_exempt
+def registration_fcm_token(request):
+    if request.method == "POST":
+        thisuser = request.user
+        data = json.loads(request.body)
+        device = Device(user=thisuser, fcmToken=data['fcmToken'])
+        device.save()
+        return JsonResponse({"message": "Success!"})

@@ -151,7 +151,7 @@ def crawl_main_notices():
                         "notice_id": id,
                         "title": title,
                         "url": notice_url,
-                        "base_url": "https://www.dongguk.edu/",
+                        "base_url": "https://www.dongguk.edu",
                         "notitype": notitype,
                         "description": description_html.prettify(),
                         "tdindex": title + description_html.get_text().replace("\n", ""),
