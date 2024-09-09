@@ -1,11 +1,8 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.core import serializers
+from django.http import JsonResponse
 from django.db.models import Q
 from user.models import Scrap
 from notice.models import Notice
 from django.views.decorators.csrf import csrf_exempt
-import json
 import datetime
 
 @csrf_exempt
@@ -40,16 +37,7 @@ def notitypes(request, type):
 @csrf_exempt
 def searches(request, query):
     if request.method == "GET": 
-        querys = query.split(" ")
-        print(querys)
-        cont = Q()
-        excl = Q()
-        for q in querys:
-            if q.startswith("-"):
-                new_q = q[1:]
-                excl |= Q(tdindex__contains = new_q)
-            else:
-                cont &= Q(tdindex__contains = q)
+        cont, excl = query_builder(query)
             
         search = Notice.objects.filter(cont).exclude(excl).values('id', 'title', 'description', 'notitype')
 
@@ -60,15 +48,7 @@ def searches(request, query):
 @csrf_exempt
 def s_type(request, query, type):
     if request.method == "GET":
-        querys = query.split(" ")
-        cont = Q()
-        excl = Q()
-        for q in querys:
-            if q.startswith("-"):
-                new_q = q[1:]
-                excl |= Q(tdindex__contains = new_q)
-            else:
-                cont &= Q(tdindex__contains = q)
+        cont, excl = query_builder(query)
 
         notices = Notice.objects.filter(cont, notitype=type).exclude(excl).values('id', 'title', 'description', 'notitype')
         return JsonResponse(list(notices), safe=False)
@@ -76,15 +56,8 @@ def s_type(request, query, type):
 @csrf_exempt
 def dates(request, query, fromdate):
     if request.method == "GET":
-        querys = query.split(" ")
-        cont = Q()
-        excl = Q()
-        for q in querys:
-            if q.startswith("-"):
-                new_q = q[1:]
-                excl |= Q(tdindex__contains = new_q)
-            else:
-                cont &= Q(tdindex__contains = q)
+        cont, excl = query_builder(query)
+
         fromdate_list = list(fromdate.split('-'))
         notice = Notice.objects.filter(
             cont, 
@@ -94,4 +67,16 @@ def dates(request, query, fromdate):
         return JsonResponse(list(notice), safe=False)
 
 
+def query_builder(query):
+    querys = query.split(" ")
+    print(querys)
+    cont = Q()
+    excl = Q()
+    for q in querys:
+        if q.startswith("-"):
+            new_q = q[1:]
+            excl |= Q(tdindex__contains = new_q)
+        else:
+            cont &= Q(tdindex__contains = q)
     
+    return cont, excl
