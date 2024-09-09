@@ -48,6 +48,7 @@ def crawl_main_notices():
     for notitype in notitypes:  # 종류별로 for문 돌리기
         for i in range(1, pages[notitype]):
             url = f"https://www.dongguk.edu/article/{notitype}/list?pageIndex=1"
+            base_url = "https://www.dongguk.edu"
             print(f"{notitype}")
             print(f"Fetching Url: {url}")
             response = requests.get(url)
@@ -113,7 +114,7 @@ def crawl_main_notices():
                             v = img.get("src", img.get("dfr-src"))
                             if v is None:
                                 continue
-                            imgs.append(img["src"])
+                            imgs.append(base_url + img["src"])
 
                     # 링크(디코 음성채팅방 참고)
                     links = []
@@ -143,7 +144,7 @@ def crawl_main_notices():
                                 attachments.append(
                                     {
                                         "name": attachment.get_text(),
-                                        "url": down_file,
+                                        "url": base_url + down_file,
                                     }
                                 )
 
