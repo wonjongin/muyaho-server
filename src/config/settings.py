@@ -31,7 +31,7 @@ environ.Env.read_env(
 
 
 
-cred_path = os.path.join(BASE_DIR, "serviceAccountKey.json")
+cred_path = os.path.join(BASE_DIR.parent, "serviceAccountKey.json")
 cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 

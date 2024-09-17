@@ -114,7 +114,7 @@ def crawl_main_notices():
                             v = img.get("src", img.get("dfr-src"))
                             if v is None:
                                 continue
-                            imgs.append(base_url + img["src"])
+                            imgs.append(f"{base_url}{img["src"]}")
 
                     # 링크(디코 음성채팅방 참고)
                     links = []
@@ -162,7 +162,8 @@ def crawl_main_notices():
                         "attachments": attachments,
                         "univ_code": "DONGGUK",
                         "org_code": "MAIN",
-                        "sub_code": "MAIN",
+                        "sub_code": notitype,
+                        "ocr_data": []
                     }
                     
                     try: 
@@ -170,7 +171,7 @@ def crawl_main_notices():
                             notice_id=id,
                             univ_code="DONGGUK",
                             org_code="MAIN",
-                            sub_code="MAIN",)
+                            sub_code=notitype,)
                     except Notice.DoesNotExist:
                         notice_object = Notice(**notice_data)
                         notice_object.save()

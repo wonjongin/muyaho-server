@@ -8,15 +8,15 @@ import datetime
 @csrf_exempt
 def notices(request):
     if request.method == "GET":
-        notices = Notice.objects.all().values('id', 'title')
+        notices = Notice.objects.all().values('id', 'title', 'description', 'notitype')
         return JsonResponse(list(notices), safe=False)
     
 @csrf_exempt
 def notice(request, num):
     if request.method == "GET":
-        thisuser = request.user
+        # thisuser = request.user
         notice = Notice.objects.get(id=num)
-        is_scrapped = Scrap.objects.filter(notice=notice, user=thisuser).exists()
+        # is_scrapped = Scrap.objects.filter(notice=notice, user=thisuser).exists()
         return JsonResponse({ 
             'id': notice.id ,
             'title': notice.title,
@@ -25,13 +25,22 @@ def notice(request, num):
             'date': notice.date,
             'tdindex': notice.tdindex,
             'notice_id': notice.notice_id,
-            'is_scrapped': is_scrapped,
+            'url': notice.url,
+            'imgs': notice.imgs,
+            'ocr_data': notice.ocr_data,
+            'links': notice.links,
+            'attachments': notice.attachments,
+            'base_url': notice.base_url,
+            'univ_code': notice.univ_code,
+            'org_code': notice.org_code,
+            'sub_code': notice.sub_code,
+            # 'is_scrapped': is_scrapped,
             }, safe=False)
         # return JsonResponse(notice, safe=False)
 @csrf_exempt
 def notitypes(request, type):
     if request.method == "GET":
-        notices = Notice.objects.filter(notitype=type).values('id', 'title')
+        notices = Notice.objects.filter(notitype=type).values('id', 'title', 'description', 'notitype')
         return JsonResponse(list(notices), safe=False)
     
 @csrf_exempt
