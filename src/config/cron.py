@@ -21,7 +21,7 @@ def crawl_main_notices():
     # notitypes = "JANGHAKNOTICE GENERALNOTICES HAKSANOTICE IPSINOTICE GLOBALNOLTICE HAKSULNOTICE SAFENOTICE BUDDHISTEVENT".split(
     #     " "
     # )
-    notitypes = ["GENERALNOTICES"]
+    notitypes = ["GENERALNOTICES", "JANGHAKNOTICE", "HAKSANOTICE", "IPSINOTICE", "GLOBALNOLTICE", "HAKSULNOTICE", "SAFENOTICE", "BUDDHISTEVENT"]
 
     # pages = {
     #     "GENERALNOTICES": 88,
@@ -35,14 +35,14 @@ def crawl_main_notices():
     # }
 
     pages = {
-        "GENERALNOTICES": 3,
-        "IPSINOTICE": 2,
-        "HAKSANOTICE": 2,
-        "GLOBALNOLTICE": 2,
-        "HAKSULNOTICE": 2,
-        "BUDDHISTEVENT": 2,
-        "JANGHAKNOTICE": 2,
-        "SAFENOTICE": 2,
+        "GENERALNOTICES": 10,
+        "IPSINOTICE": 10,
+        "HAKSANOTICE": 10,
+        "GLOBALNOLTICE": 10,
+        "HAKSULNOTICE": 10,
+        "BUDDHISTEVENT": 10,
+        "JANGHAKNOTICE": 10,
+        "SAFENOTICE": 10,
     }
 
     for notitype in notitypes:  # 종류별로 for문 돌리기

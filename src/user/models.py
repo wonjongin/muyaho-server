@@ -67,6 +67,9 @@ class Keyword(models.Model):
     title = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+class Search(models.Model):
+    search_log = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class AlarmSettings(models.Model):  # 알람
     keyword = models.CharField(max_length=100)
@@ -81,6 +84,7 @@ class AlarmSettings(models.Model):  # 알람
     # 목: 16
     # 금: 32
     # 토: 64
+    alarm_time = models.DateTimeField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 

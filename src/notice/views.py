@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.db.models import Q
-from user.models import Scrap
+from user.models import Scrap, Search
 from notice.models import Notice
 from django.views.decorators.csrf import csrf_exempt
 import datetime
@@ -8,7 +8,7 @@ import datetime
 @csrf_exempt
 def notices(request):
     if request.method == "GET":
-        notices = Notice.objects.all().values('id', 'title', 'description', 'notitype')
+        notices = Notice.objects.all().values('id', 'title', 'description', 'notitype').order_by('-date', 'id')[:50]
         return JsonResponse(list(notices), safe=False)
     
 @csrf_exempt
@@ -16,7 +16,7 @@ def notice(request, num):
     if request.method == "GET":
         # thisuser = request.user
         notice = Notice.objects.get(id=num)
-        # is_scrapped = Scrap.objects.filter(notice=notice, user=thisuser).exists()
+        # is_scrapped = Scrap.objects.filter(notice=notice, user=thisuser).order_by('-id')[:50].exists()
         return JsonResponse({ 
             'id': notice.id ,
             'title': notice.title,
@@ -40,7 +40,7 @@ def notice(request, num):
 @csrf_exempt
 def notitypes(request, type):
     if request.method == "GET":
-        notices = Notice.objects.filter(notitype=type).values('id', 'title', 'description', 'notitype')
+        notices = Notice.objects.filter(notitype=type).values('id', 'title', 'description', 'notitype').order_by('-id')[:50]
         return JsonResponse(list(notices), safe=False)
     
 @csrf_exempt
@@ -48,9 +48,9 @@ def searches(request, query):
     if request.method == "GET": 
         cont, excl = query_builder(query)
             
-        search = Notice.objects.filter(cont).exclude(excl).values('id', 'title', 'description', 'notitype')
-
-        # search = Notice.objects.filter(tdindex__in=querys).values('id', 'title', 'description', 'notitype')
+        search = Notice.objects.filter(cont).exclude(excl).values('id', 'title', 'description', 'notitype').order_by('-id')[:50]
+        Search.objects.create(search_log=query, user=request.user)
+        # search = Notice.objects.filter(tdindex__in=querys).values('id', 'title', 'description', 'notitype').order_by('-id')[:50]
         #제목이나 내용이 query를 가지고 있으며, ex_query를 가지고 있지 않다.
         return JsonResponse(list(search), safe=False)
 
@@ -59,7 +59,7 @@ def s_type(request, query, type):
     if request.method == "GET":
         cont, excl = query_builder(query)
 
-        notices = Notice.objects.filter(cont, notitype=type).exclude(excl).values('id', 'title', 'description', 'notitype')
+        notices = Notice.objects.filter(cont, notitype=type).exclude(excl).values('id', 'title', 'description', 'notitype').order_by('-id')[:50]
         return JsonResponse(list(notices), safe=False)
 
 @csrf_exempt
@@ -72,7 +72,7 @@ def dates(request, query, fromdate):
             cont, 
             date__gte=datetime.date(
                 int(fromdate_list[0]), int(fromdate_list[1]), int(fromdate_list[2]))
-            ).exclude(excl).values('id', 'title', 'description', 'notitype')
+            ).exclude(excl).values('id', 'title', 'description', 'notitype').order_by('-id')[:50]
         return JsonResponse(list(notice), safe=False)
 
 

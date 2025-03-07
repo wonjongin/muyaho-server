@@ -7,3 +7,5 @@ django-allauth
 requests
 django-crontab
 firebase-admin
+psycopg
+psycopg[binary]

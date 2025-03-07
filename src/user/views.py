@@ -26,7 +26,7 @@ def myinfo(request):
 def my_keywords(request):
     if request.method == "GET":
         thisuser = request.user
-        keywords = Keyword.objects.filter(user = thisuser).values()
+        keywords = Keyword.objects.filter(user = thisuser).values().order_by('-id')[:50]
         # res_json = serializers.serialize('json', keywords)
         return JsonResponse(list(keywords), safe=False)
     elif request.method == "POST":
@@ -65,7 +65,7 @@ def delete_keywords(request, num):
 def my_alarmsettings(request): #설정한 알림의 목록
     if request.method == "GET":
         thisuser = request.user
-        alarms = AlarmSettings.objects.filter(user=thisuser).values()
+        alarms = AlarmSettings.objects.filter(user=thisuser).values().order_by('-id')[:50]
         return JsonResponse(list(alarms), safe=False)
         
 @csrf_exempt
@@ -76,7 +76,8 @@ def my_alarmsetting(request, num):
         return JsonResponse({
             'keyword': alarms.keyword,
             'alarm_date': alarms.alram_date.isoformat(),
-            'alarm_days': alarms.alarm_days
+            'alarm_days': alarms.alarm_days,
+            'alarm_time': alarms.alarm_time
         })
 
 @csrf_exempt
@@ -88,13 +89,15 @@ def create_alarmsettings(request):
             keyword = data['keyword'],
             alarm_date = data['alarm_date'],
             alarm_days = data['alarm_days'],
+            alarm_time = data['alarm_time'],
             user = thisuser
         )
         alarms.save()
         return JsonResponse({
             'keyword': alarms.keyword,
             'alarm_date': alarms.alarm_date,
-            'alarm_days': alarms.alarm_days
+            'alarm_days': alarms.alarm_days,
+            'alarm_time': alarms.alarm_time
         })
 
 @csrf_exempt
@@ -107,6 +110,7 @@ def edit_alarmsettings(request, num):
             alarms.keyword = data.get('keyword', alarms.keyword)
             alarms.alarm_date = data.get('alarm_date', alarms.alarm_date)
             alarms.alarm_days = data.get('remind_date', alarms.alarm_days)
+            alarms.alarm_time = data.get('alarm_time', alarms.alarm_time)
             alarms.save()
             return JsonResponse({
                 'keyword': alarms.keyword,
@@ -132,7 +136,7 @@ def delete_alarmsettings(request, num):
 def my_notifications(request): #알림설정한 걸 통해서 온 알림의 목록
     if request.method == "GET":
         thisuser = request.user
-        notifications = Notification.objects.filter(user=thisuser).values('id', 'keyword', 'title', 'description', 'remind_date')
+        notifications = Notification.objects.filter(user=thisuser).values('id', 'keyword', 'title', 'description', 'remind_date').order_by('-id')[:50]
         res = []
         for r in notifications:
             res.append({
@@ -143,27 +147,33 @@ def my_notifications(request): #알림설정한 걸 통해서 온 알림의 목�
                 'remind_date': r.remind.date,
                 'notice_id': r.notice.id
             })
-        # notice = Notice.objects.filter(id=notifications.notice.id)
+        # notice = Notice.objects.filter(id=notifications.notice.id).order_by('-id')[:50]
         return JsonResponse(res, safe=False)
 
 @csrf_exempt
 def my_notification(request):
     if request.method == "GET":
         thisuser = request.user
-        alarms = Notification.objects.filter(user=thisuser).values()
+        alarms = Notification.objects.filter(user=thisuser).values().order_by('-id')[:50]
         return JsonResponse(list(alarms), safe=False)
 
 @csrf_exempt
 def delete_notifications(request, num):
     if request.method == "DELETE":
         thisuser = request.user
-        
+        notice = Notice.objects.get(id = num)
+        if notice.user == thisuser:
+            notice.delete()
+            return JsonResponse({"message": "Success!"})
+        else:
+            return JsonResponse({"message": "Fail..."}, status=401)
+
 #scrap
 @csrf_exempt
 def my_scraps(request):
     if request.method == "GET":
         thisuser = request.user
-        scraps = Scrap.objects.filter(user=thisuser)
+        scraps = Scrap.objects.filter(user=thisuser).order_by('-id')[:50]
         # return JsonResponse(list(scrap), safe=False)
         res = []
         for scrap in scraps:
